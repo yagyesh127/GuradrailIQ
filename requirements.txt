@@ -1,0 +1,10 @@
+networkx
+numpy
+pandas
+pdfplumber
+plotly
+PyMuPDF
+python-docx
+python-pptx
+scikit-learn
+streamlit
