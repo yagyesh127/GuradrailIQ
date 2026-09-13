@@ -1,0 +1,51 @@
+name: GuardrailIQ CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy pandas streamlit networkx plotly scikit-learn python-docx pymupdf pdfplumber python-pptx
+
+      - name: Compile application
+        run: python -m py_compile guardrail_iq_app.py
+
+      - name: Import application
+        run: python -c "import guardrail_iq_app"
+
+      - name: Smoke test Streamlit server
+        shell: bash
+        run: |
+          set -euo pipefail
+          streamlit run guardrail_iq_app.py --server.headless true --server.port 8501 > streamlit.log 2>&1 &
+          app_pid=$!
+          trap 'kill "$app_pid"' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8501/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat streamlit.log
+          exit 1
