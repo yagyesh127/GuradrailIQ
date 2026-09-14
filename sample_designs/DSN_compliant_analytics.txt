@@ -1,0 +1,1 @@
+Internal Analytics Dashboard. A read-only analytics dashboard on Internal-classified sales data. Hosted in an approved EU region. Access via corporate SSO with MFA for admins. Data encrypted at rest and in transit (TLS 1.3). Quarterly access reviews scheduled. Security events logged centrally.
